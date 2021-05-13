@@ -28,6 +28,10 @@ Combine all streaming media files into one video file. Specify the output filena
 
 ./stream.py -s output.ts
 
+Delete all downloaded files.
+
+./stream.py -d
+
 Purge the database to start over.
 
 ./stream.py -p
