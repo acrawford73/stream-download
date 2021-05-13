@@ -16,7 +16,7 @@ Import the streaming media assets from the playlist file into the database.
 
 ./stream.py -i playlist.m3u8
 
-View imported streaming asset details in database.
+View imported streaming asset details in database. (-l as in list)
 
 ./stream.py -l
 
