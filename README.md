@@ -35,3 +35,7 @@ Delete all downloaded files.
 Purge the database to start over.
 
 ./stream.py -p
+
+## Transcoding
+
+Transcode the combined stream file from TS to MP4 using Handbrake.
