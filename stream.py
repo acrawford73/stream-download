@@ -2,8 +2,7 @@
 # Author: Anthony Crawford
 # Target Operating System: RedHat/CentOS 6/7
 # Python Version: 2.x
-# Packages: requests (http://docs.python-requests.org/en/master/)
-#			pycurl (https://pypi.org/project/pycurl/)
+# Package: pycurl (https://pypi.org/project/pycurl/)
 # Purpose: Based on a list of assets, download video content.
 # -----------------------------------------------------------------------------
 
@@ -24,7 +23,6 @@ import logging.handlers
 # Configuration
 from ConfigParser import SafeConfigParser
 # Third-Party
-import requests
 import sqlite3
 import getopt
 import pycurl
@@ -421,11 +419,11 @@ def print_assets(assets):
 def print_help():
 	print
 	print "Usage:"
-	print "./stream.py -i <inputfile>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
+	print "./stream.py -i <input-file>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
 	print "./stream.py -p, where -p means 'purge'. Purges all assets from the assets database."
 	print "./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
 	print "./stream.py -l, where -l means 'list'. Prints all assets in the tool database."
-	print "./stream.py -s, where -s means 'stream'. Combines all video files into a single transport stream."
+	print "./stream.py -s <output-file>, where -s means 'stream'. Combines all video files into single transport stream."
 	print "./stream.py -h, where -h means 'help'. Prints this help information."
 	print "./stream.py, runs the ingest script."
 	print
