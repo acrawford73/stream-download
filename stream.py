@@ -418,6 +418,18 @@ def print_assets(assets):
 	for asset in assets:
 		print "[" + str(asset[0]) + "] " + asset[1] + " | " + asset[2] + " | " + str(asset[3])
 
+def print_help():
+	print
+	print "Usage:"
+	print "./stream.py -i <inputfile>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
+	print "./stream.py -p, where -p means 'purge'. Purges all assets from the assets database."
+	print "./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
+	print "./stream.py -l, where -l means 'list'. Prints all assets in the tool database."
+	print "./stream.py -s, where -s means 'stream'. Combines all video files into a single transport stream."
+	print "./stream.py -h, where -h means 'help'. Prints this help information."
+	print "./stream.py, runs the ingest script."
+	print
+
 #-----------------------------------------------------------------------#
 # End of Functions
 #-----------------------------------------------------------------------#
@@ -431,30 +443,14 @@ argv = sys.argv[1:]
 try:
 	opts, args = getopt.getopt(argv,"hpdlfs:o:i:o:",["ifile="])
 except getopt.GetoptError:
-	print
-	print "Usage:"
-	print "./stream.py -i <inputfile>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
-	print "./stream.py -p, where -p means 'purge'. Purges all assets from the assets database."
-	print "./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
-	print "./stream.py -l, where -l means 'list'. Prints all assets in the tool database."
-	print "./stream.py -h, where -h means 'help'. Prints this help information."
-	print "./stream.py, runs the ingest script."
-	print
+	print_help()
 	sys.exit(2)
 
 for opt, arg in opts:
 
 	# Help
 	if opt == '-h':
-		print
-		print "Usage:"
-		print "./stream.py -i <inputfile>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
-		print "./stream.py -p, where -p means 'purge'. Purges all assets from the assets database."
-		print "./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
-		print "./stream.py -l, where -l means 'list'. Prints all assets in the tool database."
-		print "./stream.py -h, where -h means 'help'. Prints this help information."
-		print "./stream.py, runs the ingest script."
-		print
+		print_help()
 		sys.exit()
 
 	# Purge
