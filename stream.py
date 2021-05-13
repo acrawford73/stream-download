@@ -466,7 +466,7 @@ for opt, arg in opts:
 			print;print('There are ' + str(len(assets_completed)) + ' completed assets that will be deleted.')
 			for asset in assets_completed:
 				time.sleep(0.2)
-				delete(asset[0])
+				delete_asset_db(asset[0])
 				filename = os.path.join(nas_path, asset[2].split('/')[-1])
 				deleted = delete_asset(filename)
 				if deleted == True:
@@ -748,8 +748,6 @@ while ingesting:
 						db_update_asset_status(database,asset[0],status_failed)
 						log.error('Failed to download asset to NAS [' + str(asset[0]) + '] ' + asset[1])
 						csv_asset_failed(asset[1],csvfile_errors,"Failed to download asset from Endpoint to NAS")
-
-			log.info('There are ' + str(count) + ' Queued assets moved to Active status.')
 
 
 	#----------------------------------------#
