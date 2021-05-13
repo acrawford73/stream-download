@@ -1,5 +1,5 @@
 # Stream Download
-Downloads ABR video from CDNs based on M3U8 playlist. 
+Downloads ABR video files from CDNs based on the M3U8 playlist. 
 Combines all downloaded video \*.ts video files into a single \*.ts file. 
 
 ## Dependency
