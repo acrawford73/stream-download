@@ -33,11 +33,11 @@ import pycurl
 config = SafeConfigParser()
 config.read('etc/config.conf')
 #
-debug = strtobool(config.get('coast', 'debug_enabled'))
-database = config.get('coast', 'database')
-queue_limit = int(config.get('coast', 'queue_limit'))
-nas_path = config.get('coast', 'nas_path')
-http_timeout = int(config.get('coast', 'http_timeout'))
+debug = strtobool(config.get('tool', 'debug_enabled'))
+database = config.get('tool', 'database')
+queue_limit = int(config.get('tool', 'queue_limit'))
+nas_path = config.get('tool', 'nas_path')
+http_timeout = int(config.get('tool', 'http_timeout'))
 
 ingest_count = 0
 ingesting = False
@@ -433,12 +433,12 @@ try:
 except getopt.GetoptError:
 	print
 	print "Usage:"
-	print "./coast.py -i <inputfile>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
-	print "./coast.py -p, where -p means 'purge'. Purges all assets from the assets database."
-	print "./coast.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
-	print "./coast.py -l, where -l means 'list'. Prints all assets in the tool database."
-	print "./coast.py -h, where -h means 'help'. Prints this help information."
-	print "./coast.py, runs the ingest script."
+	print "./stream.py -i <inputfile>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
+	print "./stream.py -p, where -p means 'purge'. Purges all assets from the assets database."
+	print "./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
+	print "./stream.py -l, where -l means 'list'. Prints all assets in the tool database."
+	print "./stream.py -h, where -h means 'help'. Prints this help information."
+	print "./stream.py, runs the ingest script."
 	print
 	sys.exit(2)
 
@@ -448,12 +448,12 @@ for opt, arg in opts:
 	if opt == '-h':
 		print
 		print "Usage:"
-		print "./coast.py -i <inputfile>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
-		print "./coast.py -p, where -p means 'purge'. Purges all assets from the assets database."
-		print "./coast.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
-		print "./coast.py -l, where -l means 'list'. Prints all assets in the tool database."
-		print "./coast.py -h, where -h means 'help'. Prints this help information."
-		print "./coast.py, runs the ingest script."
+		print "./stream.py -i <inputfile>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
+		print "./stream.py -p, where -p means 'purge'. Purges all assets from the assets database."
+		print "./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
+		print "./stream.py -l, where -l means 'list'. Prints all assets in the tool database."
+		print "./stream.py -h, where -h means 'help'. Prints this help information."
+		print "./stream.py, runs the ingest script."
 		print
 		sys.exit()
 
@@ -582,25 +582,25 @@ if inputfile:
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
-# Bussit!  Start of ./coast.py ingest with logging
+# Bussit!  Start of ./stream.py ingest with logging
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 
-coast_start_time = time.time()
+stream_start_time = time.time()
 
 #----------------------------------------#
 # Initialize Logging
 #----------------------------------------#
 #runid = str(time.time())  # epoch time
-log_file = strftime('coast%Y%m%d_%H%M%S.log')
-log_path = config.get('coast', 'log_path')
+log_file = strftime('stream%Y%m%d_%H%M%S.log')
+log_path = config.get('tool', 'log_path')
 logfile = os.path.join(log_path, log_file)
 make_sure_path_exists(log_path)
 if debug:
 	logging.basicConfig(level=logging.DEBUG) # log to stdout
 else:
 	logging.basicConfig(level=logging.INFO) # log to stdout
-log = logging.getLogger('Coast')
+log = logging.getLogger('Tool')
 handler = logging.FileHandler(logfile)
 if debug:
 	handler.setLevel(logging.DEBUG)  # log to console
@@ -622,7 +622,7 @@ make_sure_path_exists(nas_path)
 
 print
 log.info('----------------------------------')
-log.info('COAST: Asset Download Tool')
+log.info('Stream Downloader Tool')
 log.info('----------------------------------')
 
 
@@ -775,9 +775,9 @@ while ingesting:
 # Exit Summary
 log.info('Assets Ingested = ' + str(ingest_count))
 log.info('--------------------------------')
-log.info('COAST Completed')
+log.info('Completed')
 
-dur = time.time() - coast_start_time
+dur = time.time() - stream_start_time
 pos = abs( int(dur) )
 day = pos / (3600*24)
 rem = pos % (3600*24)

@@ -5,7 +5,7 @@ import logging.config
 logging.config.fileConfig("logging.conf")
 
 # Create Logger
-logger = logging.getLogger("Coast")
+logger = logging.getLogger("Tool")
 
 # Application Code
 logger.debug("debug message")
