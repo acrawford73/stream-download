@@ -5,7 +5,6 @@
 # Packages: requests (http://docs.python-requests.org/en/master/)
 #			pycurl (https://pypi.org/project/pycurl/)
 # Purpose: Based on a list of assets, download video content.
-# Usage: Run the script within the self-contained Python 2.x provided in standalone.tar.gz.
 # -----------------------------------------------------------------------------
 
 ### Packages
