@@ -407,7 +407,7 @@ def download_target(url,ingest_count,assets_total):
 			f.close()
 			c.close()	
 			return False
-		log.info('Download asset ' + filename + ' Completed. Total Time:  %f seconds' % c.getinfo(c.TOTAL_TIME))
+		log.info('Download asset ' + filename + ' Completed. Total Time:  %0.3f seconds' % c.getinfo(c.TOTAL_TIME))
 	f.close()
 	c.close()
 	return True
@@ -470,9 +470,9 @@ for opt, arg in opts:
 				filename = os.path.join(nas_path, asset[2].split('/')[-1])
 				deleted = delete_asset(filename)
 				if deleted == True:
-					print('Asset [' + str(asset[0]) + '] ' + filename + ' was deleted from NAS folder.')
+					print('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
 				elif deleted == False:
-					print('Asset [' + str(asset[0]) + '] ' + filename + ' was not deleted from NAS folder.')
+					print('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
 		# Failed asset means the API ingest failed, so remove the downloaded file
 		if len(assets_failed) > 0:
 			print;print('There are ' + str(len(assets_failed)) + ' failed assets that will be deleted.')
@@ -482,9 +482,9 @@ for opt, arg in opts:
 				filename = os.path.join(nas_path, asset[2].split('/')[-1])
 				deleted = delete_asset(filename)	
 				if deleted == True:
-					print('Asset [' + str(asset[0]) + '] ' + filename + ' was deleted from NAS folder.')
+					print('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
 				elif deleted == False:
-					print('Asset [' + str(asset[0]) + '] ' + filename + ' was not deleted from NAS folder.')
+					print('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
 		if (len(assets_completed) == 0) and (len(assets_failed) == 0):
 			print;print "There are no assets ready to be deleted."
 		print;sys.exit()
@@ -528,6 +528,7 @@ for opt, arg in opts:
 	# Combine video files to a single stream file
 	elif opt == '-s':
 		output_file = arg
+		counter = 1
 		if output_file:
 			print;print("Combining all *.ts files into single stream file...");print
 			asset_list = []
@@ -540,13 +541,16 @@ for opt, arg in opts:
 			f.close()
 			out_data = b''
 			for file in asset_list:
-				with open(nas_path+file, 'rb') as fp:
-					print file
+				with open(nas_path + file, 'rb') as fp:
+					print('[' + str(counter) + '] ' + file)
 					out_data += fp.read()
+				counter += 1	
 			fp.close()
+			print('Writing video stream to file ' + output_file)
 			with open(output_file, 'wb') as fp:
 				fp.write(out_data)
 			fp.close()
+			print;	print('Done.');print
 		else:
 			print;print("Stream filename not specified.")
 		print;sys.exit()
