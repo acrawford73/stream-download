@@ -10,7 +10,7 @@ sudo apt-get install python-pycurl
 
 ## Usage
 
-Get an \*.m3u8 playlist file for importing streaming assets.
+Get an \*.m3u8 playlist file.
 
 Import the streaming media assets from the playlist file into the database.
 
