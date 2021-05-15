@@ -538,7 +538,7 @@ for opt, arg in opts:
 						asset = (line.split('/')[-1]).strip()
 						asset_list.append(asset)
 			f.close()
-			print;print("Combining all *.ts files into single stream file " + output_file + "...");print
+
 			out_data = b''
 			for file in asset_list:
 				with open(nas_path + file, 'rb') as fp:
@@ -546,6 +546,7 @@ for opt, arg in opts:
 					out_data += fp.read()
 				counter += 1	
 			fp.close()
+			print;print("Combining all *.ts files into single stream file " + output_file + "...");print
 			with open(output_file, 'wb') as fp:
 				fp.write(out_data)
 			fp.close()
