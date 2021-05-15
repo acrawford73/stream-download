@@ -190,7 +190,6 @@ def get_inventory_print(database):
 	assets_completed = []
 	assets_not_found = []
 	assets_failed = []
-	assets_other = []
 
 	conn = sqlite3.connect(database)
 	# New
@@ -223,15 +222,10 @@ def get_inventory_print(database):
 	c.execute("SELECT * FROM assets WHERE status=5")
 	assets_failed = c.fetchall()
 	print('Failed    = ' + str(len(assets_failed)))
-	# Other Error
-	c = conn.cursor()
-	c.execute("SELECT * FROM assets WHERE status=6")
-	assets_other = c.fetchall()
-	print('Other     = ' + str(len(assets_other)))
 
 	conn.close()
 	print('--------------------------------')
-#	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed, assets_other]
+#	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed]
 
 
 def db_get_inventory_log(database):
@@ -244,7 +238,6 @@ def db_get_inventory_log(database):
 	assets_completed = []
 	assets_not_found = []
 	assets_failed = []
-	assets_other = []
 
 	conn = sqlite3.connect(database)
 	# New
@@ -277,15 +270,10 @@ def db_get_inventory_log(database):
 	c.execute("SELECT * FROM assets WHERE status=5")
 	assets_failed = c.fetchall()
 	log.info('Failed    = ' + str(len(assets_failed)))
-	# Other Error
-	c = conn.cursor()
-	c.execute("SELECT * FROM assets WHERE status=6")
-	assets_other = c.fetchall()
-	log.info('Other     = ' + str(len(assets_other)))
 
 	conn.close()
 	log.info('--------------------------------')
-	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed, assets_other]
+	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed]
 
 
 def db_get_inventory(database):
@@ -295,7 +283,7 @@ def db_get_inventory(database):
 	assets_completed = []
 	assets_not_found = []
 	assets_failed = []
-	assets_other = []
+
 	conn = sqlite3.connect(database)
 	# New
 	c = conn.cursor()
@@ -321,13 +309,9 @@ def db_get_inventory(database):
 	c = conn.cursor()
 	c.execute("SELECT * FROM assets WHERE status=5")
 	assets_failed = c.fetchall()
-	# Other Error
-	c = conn.cursor()
-	c.execute("SELECT * FROM assets WHERE status=6")
-	assets_other = c.fetchall()
 
 	conn.close()
-	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed, assets_other]
+	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed]
 
 
 def db_update_asset_status(database,aid,status):
@@ -516,11 +500,7 @@ for opt, arg in opts:
 		if len(assets_failed) > 0:
 			print;print "Failed Assets = " + str(len(assets_failed))
 			print_assets(assets_failed)
-		assets_other = inventory[6]
-		if len(assets_other) > 0:
-			print;print "Other Assets = " + str(len(assets_other))
-			print_assets(assets_other)
-		if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_active) == 0) and (len(assets_completed) == 0) and (len(assets_not_found) == 0) and (len(assets_failed) == 0) and (len(assets_other) == 0):
+		if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_active) == 0) and (len(assets_completed) == 0) and (len(assets_not_found) == 0) and (len(assets_failed) == 0):
 			print;print("The database contains no assets.")
 		get_inventory_print(database)
 		print;sys.exit()
@@ -619,9 +599,9 @@ csvfile_errors = os.path.join(log_path, csvfn_errors)
 make_sure_path_exists(nas_path)
 
 print
-log.info('----------------------------------')
+log.info('--------------------------------')
 log.info('Stream Downloader Tool')
-log.info('----------------------------------')
+#log.info('--------------------------------')
 
 
 #----------------------------------------#
@@ -635,14 +615,12 @@ log.info('----------------------------------')
 # 3 Completed
 # 4 Not Found
 # 5 Failed
-# 6 Other Error - Undefined, Delete, Pending Delete
 status_new = 0
 status_queued = 1
 status_active = 2
 status_completed = 3
 status_not_found = 4
 status_failed = 5
-status_other = 6
 
 #----------------------------------------#
 if db_check_exists(database):
@@ -654,14 +632,13 @@ if db_check_exists(database):
 	assets_completed = inventory[3]
 	assets_not_found = inventory[4]
 	assets_failed = inventory[5]
-	assets_other = inventory[6]
 
 # Determine if we need to continue processing assets from the last time the script was run
-if (len(assets_new) > 0) or (len(assets_queued) > 0) or (len(assets_active) > 0):
+if (len(assets_new) > 0) or (len(assets_queued) > 0) or (len(assets_active) > 0) or (len(assets_failed) > 0):
 	log.info('... Ingesting ...')
 	ingesting = True
 else:
-	log.error('There are no assets available to ingest. Exiting...')
+	log.info('There are no assets available to ingest. Exiting...')
 
 
 #----------------------------------------#
@@ -673,7 +650,7 @@ while ingesting:
 
 	#----------------------------------------#
 	# Exit if no assets available or ingest completed
-	if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_active) == 0):
+	if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_active) == 0) and (len(assets_failed) == 0):
 		ingesting = False
 		log.info('There are no assets ready to ingest, or ingest has completed. Exiting...')
 		db_get_inventory_log(database)
@@ -691,7 +668,6 @@ while ingesting:
 		assets_completed = inventory[3]
 		assets_not_found = inventory[4]
 		assets_failed = inventory[5]
-		assets_other = inventory[6]
 
 		log.debug('----------------')
 		log.debug('Asset Inventory:')
@@ -713,9 +689,6 @@ while ingesting:
 		for asset in assets_failed:
 			log.debug(asset)
 		log.debug('Failed    = ' + str(len(assets_failed)))
-		for asset in assets_other:
-			log.debug(asset)
-		log.debug('Other     = ' + str(len(assets_other)))
 
 
 	#----------------------------------------#
@@ -750,8 +723,8 @@ while ingesting:
 						ingest_count+=1
 					else:
 						db_update_asset_status(database,asset[0],status_failed)
-						log.error('Failed to download asset to NAS [' + str(asset[0]) + '] ' + asset[1])
-						csv_asset_failed(asset[1],csvfile_errors,"Failed to download asset from Endpoint to NAS")
+						log.error('Failed to download asset [' + str(asset[0]) + '] ' + asset[1])
+						csv_asset_failed(asset[1],csvfile_errors,"Failed to download asset from CDN")
 
 
 	#----------------------------------------#
@@ -765,6 +738,24 @@ while ingesting:
 			log.debug('Moved New asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
 			count+=1
 		log.info('There are ' + str(count) + ' New assets moved to Queue status.')
+
+	#----------------------------------------#
+	# Process Failed Assets
+	# Move Failed assets to Queued status
+	if len(assets_failed) > 0:
+		log.info('There are ' + str(len(assets_new)) + ' failed assets to reingest.' )
+		count = 0
+		for asset in assets_failed:
+			db_update_asset_status(database,asset[0],status_queued)
+			log.info('Moved Failed asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
+			count+=1
+			filename = os.path.join(nas_path, asset[1])
+			deleted = delete_asset(filename)
+			if deleted == True:
+				log.info('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
+			elif deleted == False:
+				log.error('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
+		log.info('There are ' + str(count) + ' Failed assets moved to Queue status.')		
 
 
 #----------------------------------------#
