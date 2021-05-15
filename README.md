@@ -1,12 +1,14 @@
 # Stream Download
 
-Downloads ABR video files from CDNs based on the M3U8 playlist. 
+Purpose: To archive or scrape video from the web. 
 
-Combines all downloaded video \*.ts video files into a single \*.ts file. 
+Description: The tool downloads ABR video files from CDNs based on the M3U8 playlist. It can combine all downloaded video \*.ts video files into a single specified \*.ts file. 
 
-## Dependency
+## Dependencies
 
-sudo apt-get install python-pycurl
+Python 2.x
+
+Package: python-pycurl
 
 ## Usage
 
