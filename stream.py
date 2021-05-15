@@ -530,7 +530,6 @@ for opt, arg in opts:
 		output_file = arg
 		counter = 1
 		if output_file:
-			print;print("Combining all *.ts files into single stream file...");print
 			asset_list = []
 			f=open('playback.m3u8','r')
 			for line in f.readlines():
@@ -539,6 +538,7 @@ for opt, arg in opts:
 						asset = (line.split('/')[-1]).strip()
 						asset_list.append(asset)
 			f.close()
+			print;print("Combining all *.ts files into single stream file " + output_file + "...");print
 			out_data = b''
 			for file in asset_list:
 				with open(nas_path + file, 'rb') as fp:
@@ -546,11 +546,10 @@ for opt, arg in opts:
 					out_data += fp.read()
 				counter += 1	
 			fp.close()
-			print('Writing video stream to file ' + output_file)
 			with open(output_file, 'wb') as fp:
 				fp.write(out_data)
 			fp.close()
-			print;	print('Done.');print
+			print;print('Done.')
 		else:
 			print;print("Stream filename not specified.")
 		print;sys.exit()
