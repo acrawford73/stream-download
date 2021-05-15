@@ -22,7 +22,7 @@ View imported streaming asset details in database. (-l as in list)
 
 ./stream.py -l
 
-Download all streaming media assets from CDN and store locally in "video" folder.
+Download all streaming media assets from CDN and store locally in "video" folder. If any assets fail to download, just run the script again.
 
 ./stream.py
 
