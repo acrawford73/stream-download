@@ -526,7 +526,7 @@ for opt, arg in opts:
 					out_data += fp.read()
 				counter += 1	
 			fp.close()
-			print;print("Combining all *.ts files into single stream file " + output_file + "...");print
+			print;print("Combining all *.ts files into single stream file " + output_file + "...")
 			with open(output_file, 'wb') as fp:
 				fp.write(out_data)
 			fp.close()
