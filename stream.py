@@ -34,7 +34,7 @@ config.read('etc/config.conf')
 debug = strtobool(config.get('tool', 'debug_enabled'))
 database = config.get('tool', 'database')
 queue_limit = int(config.get('tool', 'queue_limit'))
-nas_path = config.get('tool', 'nas_path')
+storage_path = config.get('tool', 'storage_path')
 http_timeout = int(config.get('tool', 'http_timeout'))
 
 ingest_count = 0
@@ -376,7 +376,7 @@ def download_target(url,ingest_count,assets_total):
 		c.setopt(c.VERBOSE, True)
 	c.setopt(c.URL, url)
 	filename = url.split('/')[-1]
-	local_filename = os.path.join(nas_path, filename)
+	local_filename = os.path.join(storage_path, filename)
 	with open(local_filename, 'wb') as f:
 		log.info("Downloading: ["+str(ingest_count)+"/"+str(assets_total)+"] " + filename)
 		c.setopt(c.WRITEFUNCTION, f.write)
@@ -451,19 +451,19 @@ for opt, arg in opts:
 			for asset in assets_completed:
 				time.sleep(0.2)
 				delete_asset_db(asset[0])
-				filename = os.path.join(nas_path, asset[2].split('/')[-1])
+				filename = os.path.join(storage_path, asset[2].split('/')[-1])
 				deleted = delete_asset(filename)
 				if deleted == True:
 					print('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
 				elif deleted == False:
 					print('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
-		# Failed asset means the API ingest failed, so remove the downloaded file
+		# Failed asset means the download failed, so remove the downloaded file
 		if len(assets_failed) > 0:
 			print;print('There are ' + str(len(assets_failed)) + ' failed assets that will be deleted.')
 			for asset in assets_failed:
 				time.sleep(0.2)
 				delete_asset_db(asset[0])
-				filename = os.path.join(nas_path, asset[2].split('/')[-1])
+				filename = os.path.join(storage_path, asset[2].split('/')[-1])
 				deleted = delete_asset(filename)	
 				if deleted == True:
 					print('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
@@ -473,7 +473,7 @@ for opt, arg in opts:
 			print;print "There are no assets ready to be deleted."
 		print;sys.exit()
 
-	# View
+	# List
 	elif opt == '-l':
 		inventory = db_get_inventory(database)
 		assets_new = inventory[0]
@@ -521,7 +521,7 @@ for opt, arg in opts:
 
 			out_data = b''
 			for file in asset_list:
-				with open(nas_path + file, 'rb') as fp:
+				with open(storage_path + file, 'rb') as fp:
 					print('[' + str(counter) + '] ' + file)
 					out_data += fp.read()
 				counter += 1	
@@ -595,8 +595,8 @@ if debug:
 csvfn_errors = log_file.rsplit('.',1)[0] + '_failed.csv'
 csvfile_errors = os.path.join(log_path, csvfn_errors)
 
-# Create NAS path if it doesn't exist
-make_sure_path_exists(nas_path)
+# Create storage path if it doesn't exist
+make_sure_path_exists(storage_path)
 
 print
 log.info('--------------------------------')
@@ -644,7 +644,6 @@ else:
 #----------------------------------------#
 # Main Ingest Processing Loop
 #----------------------------------------#
-dld_num = 0
 
 while ingesting:
 
@@ -711,10 +710,10 @@ while ingesting:
 					# slack off a bit before each asset download
 					time.sleep(0.05)
 
-					# Download the asset file from Endpoint to NAS.
+					# Download the asset file
 					downloaded = download_target(asset[2],ingest_count+1,assets_total)
 
-					# Perform API call only if download was successful.
+					# Update database only if download was successful.
 					if downloaded == True:
 						db_update_asset_status(database,asset[0],status_completed)
 						log.debug('Moved Queued Asset [' + str(asset[0]) + '] ' + asset[1] + ' to Completed status.')
@@ -749,7 +748,7 @@ while ingesting:
 			db_update_asset_status(database,asset[0],status_queued)
 			log.info('Moved Failed asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
 			count+=1
-			filename = os.path.join(nas_path, asset[1])
+			filename = os.path.join(storage_path, asset[1])
 			deleted = delete_asset(filename)
 			if deleted == True:
 				log.info('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
