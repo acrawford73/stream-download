@@ -228,6 +228,85 @@ def get_inventory_print(database):
 #	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed]
 
 
+def delete_asset(path):
+	if os.path.exists(path):
+		try:
+			os.remove(path)
+		except OSError:
+			print("Error occurred deleting file: " + path)
+			return False
+	else:
+		print("File does not exist: " + path)
+		return False
+	return True
+
+def delete_asset_db(asset):
+	conn = sqlite3.connect(database)
+	c = conn.cursor()
+	c.execute("DELETE FROM assets WHERE id=?", (int(asset),))
+	conn.commit()
+	conn.close()
+
+def duration_msg(duration,message):
+	duration = round(duration,3)
+	if duration < 1:
+		duration = str(duration * 1000)
+		duration = duration.split('.')[0]
+		msg = message + ' ' + duration + ' msec'
+	elif duration >= 1 and duration < 60:
+		msg = message + ' ' + str(duration) + ' sec'
+	elif duration >= 60: # minutes
+		minutes, seconds = divmod(duration, 60)
+		if seconds > 0:
+			msg = message + ' ' + str(minutes) + ' min ' + str(seconds) + ' sec'
+		else:
+			msg = message + ' ' + str(minutes) + ' min'
+	return msg
+
+# Log duration of event (minutes seconds)
+def duration_log(duration,message):
+	duration = round(duration,3)
+	log.debug(duration_msg(duration,message))
+
+# Calculate duration of event (minutes seconds)
+def duration_dld(duration):
+	duration = round(duration,3)
+	if duration < 1:
+		duration = str(duration * 1000)
+		duration = duration.split('.')[0]
+		dur = duration + ' msec'
+	elif duration >= 1 and duration < 60: # sec
+		dur = str(duration) + ' sec'
+	elif duration >= 60: # minutes
+		minutes, seconds = divmod(duration, 60)
+		if seconds > 0:
+			dur = str(minutes) + ' min ' + str(seconds) + ' sec'
+		else:
+			dur = str(minutes) + ' min'
+	return dur
+
+# Check if field is empty
+def is_empty(any_structure):
+	if any_structure:
+		#print('Structure is not empty.')
+		return False
+	else:
+		#print('Structure is empty.')
+		return True
+
+# check if asset list inputfile is present
+def file_check_exists(inputfile):
+	exists = os.path.isfile(inputfile)
+	if exists:
+		if debug:
+			print('Assets file ' + inputfile + ' found.')
+		return True
+	else:
+		if debug:
+			print('Assets file ' + inputfile + ' not found!')
+		return False
+
+
 def db_get_inventory_log(database):
 	log.info('--------------------------------')
 	log.info('Assets Database:')
