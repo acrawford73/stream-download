@@ -188,7 +188,6 @@ def get_inventory_print(database):
 	assets_queued = []
 	assets_active = []
 	assets_completed = []
-	assets_not_found = []
 	assets_failed = []
 
 	conn = sqlite3.connect(database)
@@ -212,11 +211,6 @@ def get_inventory_print(database):
 	c.execute("SELECT * FROM assets WHERE status=3")
 	assets_completed = c.fetchall()
 	print('Completed = ' + str(len(assets_completed)))
-	# Not Found
-	c = conn.cursor()
-	c.execute("SELECT * FROM assets WHERE status=4")
-	assets_not_found = c.fetchall()
-	print('Not Found = ' + str(len(assets_not_found)))
 	# Failed
 	c = conn.cursor()
 	c.execute("SELECT * FROM assets WHERE status=5")
@@ -225,7 +219,7 @@ def get_inventory_print(database):
 
 	conn.close()
 	print('--------------------------------')
-#	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed]
+#	return [assets_new, assets_queued, assets_active, assets_completed, assets_failed]
 
 
 def delete_asset(path):
@@ -315,7 +309,6 @@ def db_get_inventory_log(database):
 	assets_queued = []
 	assets_active = []
 	assets_completed = []
-	assets_not_found = []
 	assets_failed = []
 
 	conn = sqlite3.connect(database)
@@ -339,11 +332,6 @@ def db_get_inventory_log(database):
 	c.execute("SELECT * FROM assets WHERE status=3")
 	assets_completed = c.fetchall()
 	log.info('Completed = ' + str(len(assets_completed)))
-	# Not Found
-	c = conn.cursor()
-	c.execute("SELECT * FROM assets WHERE status=4")
-	assets_not_found = c.fetchall()
-	log.info('Not Found = ' + str(len(assets_not_found)))
 	# Failed
 	c = conn.cursor()
 	c.execute("SELECT * FROM assets WHERE status=5")
@@ -352,7 +340,7 @@ def db_get_inventory_log(database):
 
 	conn.close()
 	log.info('--------------------------------')
-	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed]
+	return [assets_new, assets_queued, assets_active, assets_completed, assets_failed]
 
 
 def db_get_inventory(database):
@@ -360,7 +348,6 @@ def db_get_inventory(database):
 	assets_queued = []
 	assets_active = []
 	assets_completed = []
-	assets_not_found = []
 	assets_failed = []
 
 	conn = sqlite3.connect(database)
@@ -380,17 +367,13 @@ def db_get_inventory(database):
 	c = conn.cursor()
 	c.execute("SELECT * FROM assets WHERE status=3")
 	assets_completed = c.fetchall()
-	# Not Found
-	c = conn.cursor()
-	c.execute("SELECT * FROM assets WHERE status=4")
-	assets_not_found = c.fetchall()
 	# Failed
 	c = conn.cursor()
 	c.execute("SELECT * FROM assets WHERE status=5")
 	assets_failed = c.fetchall()
 
 	conn.close()
-	return [assets_new, assets_queued, assets_active, assets_completed, assets_not_found, assets_failed]
+	return [assets_new, assets_queued, assets_active, assets_completed, assets_failed]
 
 
 def db_update_asset_status(database,aid,status):
@@ -496,6 +479,8 @@ def print_help():
 #-----------------------------------------------------------------------#
 
 
+### Start of script ###
+
 #----------------------------------------#
 # CLI Command Options
 #----------------------------------------#
@@ -571,15 +556,11 @@ for opt, arg in opts:
 		if len(assets_completed) > 0:
 			print;print "Completed Assets = " + str(len(assets_completed))
 			print_assets(assets_completed)
-		assets_not_found = inventory[4]
-		if len(assets_not_found) > 0:
-			print;print "Not Found Assets = " + str(len(assets_not_found))
-			print_assets(assets_not_found)
 		assets_failed = inventory[5]
 		if len(assets_failed) > 0:
 			print;print "Failed Assets = " + str(len(assets_failed))
 			print_assets(assets_failed)
-		if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_active) == 0) and (len(assets_completed) == 0) and (len(assets_not_found) == 0) and (len(assets_failed) == 0):
+		if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_active) == 0) and (len(assets_completed) == 0) and (len(assets_failed) == 0):
 			print;print("The database contains no assets.")
 		get_inventory_print(database)
 		print;sys.exit()
@@ -698,7 +679,6 @@ status_new = 0
 status_queued = 1
 status_active = 2
 status_completed = 3
-status_not_found = 4
 status_failed = 5
 
 #----------------------------------------#
@@ -709,7 +689,6 @@ if db_check_exists(database):
 	assets_queued = inventory[1]
 	assets_active = inventory[2]
 	assets_completed = inventory[3]
-	assets_not_found = inventory[4]
 	assets_failed = inventory[5]
 
 # Determine if we need to continue processing assets from the last time the script was run
@@ -744,7 +723,6 @@ while ingesting:
 		assets_queued = inventory[1]
 		assets_active = inventory[2]
 		assets_completed = inventory[3]
-		assets_not_found = inventory[4]
 		assets_failed = inventory[5]
 
 		log.debug('----------------')
@@ -761,9 +739,6 @@ while ingesting:
 		for asset in assets_completed:
 			log.debug(asset)
 		log.debug('Completed = ' + str(len(assets_completed)))
-		for asset in assets_not_found:
-			log.debug(asset)
-		log.debug('Not Found = ' + str(len(assets_not_found)))
 		for asset in assets_failed:
 			log.debug(asset)
 		log.debug('Failed    = ' + str(len(assets_failed)))
