@@ -509,7 +509,7 @@ for opt, arg in opts:
 		# remove all Completed/Failed assets from database and NAS
 		inventory = db_get_inventory(database)
 		assets_completed = inventory[3]
-		assets_failed = inventory[5]
+		assets_failed = inventory[4]
 		if len(assets_completed) > 0:
 			print;print('There are ' + str(len(assets_completed)) + ' completed assets that will be deleted.')
 			for asset in assets_completed:
@@ -556,7 +556,7 @@ for opt, arg in opts:
 		if len(assets_completed) > 0:
 			print;print "Completed Assets = " + str(len(assets_completed))
 			print_assets(assets_completed)
-		assets_failed = inventory[5]
+		assets_failed = inventory[4]
 		if len(assets_failed) > 0:
 			print;print "Failed Assets = " + str(len(assets_failed))
 			print_assets(assets_failed)
@@ -689,7 +689,7 @@ if db_check_exists(database):
 	assets_queued = inventory[1]
 	assets_active = inventory[2]
 	assets_completed = inventory[3]
-	assets_failed = inventory[5]
+	assets_failed = inventory[4]
 
 # Determine if we need to continue processing assets from the last time the script was run
 if (len(assets_new) > 0) or (len(assets_queued) > 0) or (len(assets_active) > 0) or (len(assets_failed) > 0):
@@ -723,7 +723,7 @@ while ingesting:
 		assets_queued = inventory[1]
 		assets_active = inventory[2]
 		assets_completed = inventory[3]
-		assets_failed = inventory[5]
+		assets_failed = inventory[4]
 
 		log.debug('----------------')
 		log.debug('Asset Inventory:')
