@@ -453,7 +453,7 @@ def download_target(url,ingest_count,assets_total):
 			f.close()
 			c.close()	
 			return False
-		log.info('Download asset ' + filename + ' Completed. Total Time:  %0.3f seconds' % c.getinfo(c.TOTAL_TIME))
+		log.info('Asset download  ' + filename + ' completed in %0.3f seconds' % c.getinfo(c.TOTAL_TIME))
 	f.close()
 	c.close()
 	return True
@@ -629,7 +629,6 @@ stream_start_time = time.time()
 #----------------------------------------#
 # Initialize Logging
 #----------------------------------------#
-#runid = str(time.time())  # epoch time
 log_file = strftime('stream%Y%m%d_%H%M%S.log')
 log_path = config.get('tool', 'log_path')
 logfile = os.path.join(log_path, log_file)
@@ -648,12 +647,8 @@ formatter = logging.Formatter('%(asctime)s.%(msecs)03d:%(levelname)s:%(message)s
 handler.setFormatter(formatter)
 log.addHandler(handler)
 
-if debug:
-	logging.getLogger('urllib3').setLevel(logging.DEBUG)
-
-# Error log file
-csvfn_errors = log_file.rsplit('.',1)[0] + '_failed.csv'
-csvfile_errors = os.path.join(log_path, csvfn_errors)
+# if debug:
+# 	logging.getLogger('urllib3').setLevel(logging.DEBUG)
 
 # Create storage path if it doesn't exist
 make_sure_path_exists(storage_path)
