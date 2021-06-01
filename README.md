@@ -1,6 +1,6 @@
 # Stream Download
 
-Purpose: To archive or scrape video from the web. 
+Purpose: To archive or scrape video from the web. Tested with Dlive.tv. 
 
 Description: The tool downloads non-DRM ABR video files from CDNs based on the M3U8 playlist. It can combine all downloaded video \*.ts files into a single specified \*.ts file. 
 
