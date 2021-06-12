@@ -16,27 +16,39 @@ Get an \*.m3u8 playlist file.
 
 Import the streaming media assets from the playlist file into the database.
 
+```bash
 ./stream.py -i playlist.m3u8
+```
 
 View imported streaming asset details in database. (-l as in list)
 
+```bash
 ./stream.py -l
+```
 
 Download all streaming media assets from CDN and store locally in "video" folder. If any assets fail to download, just run the script again.
 
+```bash
 ./stream.py
+```
 
 Combine all streaming media files into one video file. Specify the output filename.
 
+```bash
 ./stream.py -s output.ts
+```
 
 Delete all downloaded files.
 
+```bash
 ./stream.py -d
+```
 
 Purge the database to start over.
 
+```bash
 ./stream.py -p
+```
 
 ## Transcoding
 

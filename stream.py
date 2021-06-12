@@ -521,6 +521,10 @@ for opt, arg in opts:
 					print('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
 				elif deleted == False:
 					print('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
+                                deleted = delete_asset('playback.m3u8')
+                                if deleted == True:
+                                        print('playback.m3u8 file deleted.')
+
 		# Failed asset means the download failed, so remove the downloaded file
 		if len(assets_failed) > 0:
 			print;print('There are ' + str(len(assets_failed)) + ' failed assets that will be deleted.')
