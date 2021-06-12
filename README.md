@@ -38,7 +38,7 @@ Combine all streaming media files into one video file. Specify the output filena
 ./stream.py -s output.ts
 ```
 
-Delete all downloaded files.
+Delete all downloaded files and assets from database.
 
 ```bash
 ./stream.py -d
