@@ -3,6 +3,7 @@
 # Target Operating System: RedHat/CentOS 6/7
 # Python Version: 2.x
 # Package: pycurl (https://pypi.org/project/pycurl/)
+# sudo apt install python-pycurl
 # Purpose: Based on a list of assets, download video content.
 # -----------------------------------------------------------------------------
 #
