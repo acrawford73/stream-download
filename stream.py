@@ -634,7 +634,7 @@ stream_start_time = time.time()
 #----------------------------------------#
 # Initialize Logging
 #----------------------------------------#
-log_file = strftime('stream%Y%m%d_%H%M%S.log')
+log_file = strftime('stream_%Y%m%d_%H%M%S.log')
 log_path = config.get('tool', 'log_path')
 logfile = os.path.join(log_path, log_file)
 make_sure_path_exists(log_path)
@@ -764,23 +764,33 @@ while ingesting:
 					# slack off a bit before each asset download
 					time.sleep(0.05)
 
-					# Download the asset file
-					downloaded = download_target(asset[2],ingest_count+1,assets_total)
+					# Download the asset file if not downloaded already
+					# Allows resume from last downloaded file
+					if not file_check_exists(os.path.join('video/', asset[1])):
+						downloaded = download_target(asset[2],ingest_count+1,assets_total)
+					else:
+						continue
 
 					# Update database only if download was successful.
 					if downloaded == True:
 						db_update_asset_status(database,asset[0],status_completed)
 						log.debug('Moved Queued Asset [' + str(asset[0]) + '] ' + asset[1] + ' to Completed status.')
 						count+=1
-						active_slots-=1
+						active_slots-=1	
 						ingest_count+=1
 					else:
 						db_update_asset_status(database,asset[0],status_failed)
 						log.error('Failed to download asset [' + str(asset[0]) + '] ' + asset[1])
+						csvfn_errors = log_file.rsplit('.',1)[0] + '_failed.csv'
+						csvfile_errors = os.path.join(log_path, csvfn_errors)
+						if os.path.exists(csvfile_errors) == False:
+							with open(csvfile_errors, 'w') as f:
+								f.write('asset,error\n')
+							f.close()
 						csv_asset_failed(asset[1],csvfile_errors,"Failed to download asset from CDN")
 
 
-	#----------------------------------------#
+	#--------------------------------------	--#
 	# Process New Assets
 	# Move New assets to Queued status
 	if len(assets_new) > 0:
