@@ -12,10 +12,10 @@ Package: python-pycurl
 
 ## Usage
 
-Get an \*.m3u8 playlist file from the streaming website.
+Get an \*.m3u8 playlist file from the streaming website. (example link)
 
 ```bash
-wget -L https://url.m3u8
+wget -L https://url.com/playlist.m3u8
 ```
 
 Import the streaming media assets from the playlist file into the database.
