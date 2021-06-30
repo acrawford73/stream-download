@@ -12,7 +12,11 @@ Package: python-pycurl
 
 ## Usage
 
-Get an \*.m3u8 playlist file.
+Get an \*.m3u8 playlist file from the streaming website.
+
+```bash
+wget -L https://url.m3u8
+```
 
 Import the streaming media assets from the playlist file into the database.
 
@@ -48,6 +52,11 @@ Purge the database to start over.
 
 ```bash
 ./stream.py -p
+```
+
+Clear the database and remove all downloaded video files. (faster than -d option)
+```bash
+./reset.sh
 ```
 
 ## Transcoding
