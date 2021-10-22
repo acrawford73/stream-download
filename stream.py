@@ -774,7 +774,7 @@ while ingesting:
 					# Update database only if download was successful.
 					if downloaded == True:
 						db_update_asset_status(database,asset[0],status_completed)
-						log.debug('Moved Queued Asset [' + str(asset[0]) + '] ' + asset[1] + ' to Completed status.')
+						log.debug('Asset [' + str(asset[0]) + '] ' + asset[1] + ' was successfully downloaded.')
 						count+=1
 						active_slots-=1	
 						ingest_count+=1
@@ -800,7 +800,7 @@ while ingesting:
 			db_update_asset_status(database,asset[0],status_queued)
 			log.debug('Moved New asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
 			count+=1
-		log.info('There are ' + str(count) + ' New assets moved to Queue status.')
+		log.info('There are ' + str(count) + ' new assets moved to download queue.')
 
 	#----------------------------------------#
 	# Process Failed Assets
@@ -810,7 +810,7 @@ while ingesting:
 		count = 0
 		for asset in assets_failed:
 			db_update_asset_status(database,asset[0],status_queued)
-			log.info('Moved Failed asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
+			log.info('Moved failed asset [' + str(asset[0]) + '] ' + asset[1] + ' to download queue.')
 			count+=1
 			filename = os.path.join(storage_path, asset[1])
 			deleted = delete_asset(filename)
@@ -818,7 +818,7 @@ while ingesting:
 				log.info('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
 			elif deleted == False:
 				log.error('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
-		log.info('There are ' + str(count) + ' Failed assets moved to Queue status.')		
+		log.info('There are ' + str(count) + ' failed assets moved to download queue.')		
 
 
 #----------------------------------------#
