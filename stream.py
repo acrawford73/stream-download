@@ -169,7 +169,7 @@ def db_asset_importer(database,inputfile):
 	f=open(inputfile,'r')
 	for line in f.readlines():
 		if (not line in ['\n','\r\n']):
-			 if line.startswith('http') or line.startswith('https'):
+			if line.startswith('http') or line.startswith('https'):
 				asset = (line.split('/')[-1]).strip();print "[" + str(asset_count+1) + "] " + asset
 				asset_uri = line.strip();print asset_uri
 				c.execute("INSERT INTO assets (asset,asset_uri) \
