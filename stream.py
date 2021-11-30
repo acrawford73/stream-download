@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # Author: Anthony Crawford
 # Target Operating System: RedHat/CentOS 6/7
-# Python Version: 2.x
+# Python Version: 2
 # Package: pycurl (https://pypi.org/project/pycurl/)
 # sudo apt install python-pycurl
 # Purpose: Based on a list of assets, download video content.
@@ -806,7 +806,7 @@ while ingesting:
 	# Process Failed Assets
 	# Move Failed assets to Queued status
 	if len(assets_failed) > 0:
-		log.info('There are ' + str(len(assets_new)) + ' failed assets to reingest.' )
+		log.info('There are ' + str(len(assets_failed)) + ' failed assets to reingest.' )
 		count = 0
 		for asset in assets_failed:
 			db_update_asset_status(database,asset[0],status_queued)
