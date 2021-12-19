@@ -1,9 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # Author: Anthony Crawford
 # Target Operating System: RedHat/CentOS 6/7
 # Python Version: 3
 # Package: pycurl (https://pypi.org/project/pycurl/)
 # sudo apt install python-pycurl
+# sudo apt install python-configparser
 # Purpose: Based on a list of assets, download video content.
 # -----------------------------------------------------------------------------
 #
@@ -22,14 +23,14 @@ import logging
 import logging.config
 import logging.handlers
 # Configuration
-from ConfigParser import SafeConfigParser
+import configparser
 # Third-Party
 import sqlite3
 import getopt
 import pycurl
 
 ### Load Configuration Parameters
-config = SafeConfigParser()
+config = configparser.ConfigParser()
 config.read('etc/config.conf')
 #
 debug = strtobool(config.get('tool', 'debug_enabled'))
@@ -427,7 +428,7 @@ def download_target(url,ingest_count,assets_total):
 	#c.setopt(c.TCP_KEEPINTVL, 30L)
 	#c.setopt(c.TCP_KEEPIDLE, 120L)
 	c.setopt(c.FOLLOWLOCATION, False)
-	c.setopt(c.CONNECTTIMEOUT, 10L)
+	c.setopt(c.CONNECTTIMEOUT, 10)
 	# The connection is dropped if the asset isn't downloaded within the c.TIMEOUT window.
 	#c.setopt(c.TIMEOUT, 60L)  # DO NOT set this timeout! 
 	c.setopt(c.NOSIGNAL, True)
