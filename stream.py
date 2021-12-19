@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # Author: Anthony Crawford
 # Target Operating System: RedHat/CentOS 6/7
-# Python Version: 2
+# Python Version: 3
 # Package: pycurl (https://pypi.org/project/pycurl/)
 # sudo apt install python-pycurl
 # Purpose: Based on a list of assets, download video content.
@@ -152,13 +152,13 @@ def db_check_exists(database):
 		#print('Database ' + database + ' already created.')
 		return True
 	else:
-		print;print('Database ' + database + ' missing, creating new database.')
+		print();print('Database ' + database + ' missing, creating new database.')
 		conn = sqlite3.connect(database)
 		c = conn.cursor()
 		c.execute(sql)
 		conn.commit()
 		conn.close()
-		print;print('Database ' + database + ' created.')
+		print();print('Database ' + database + ' created.')
 		return True
 
 def db_asset_importer(database,inputfile):
@@ -170,19 +170,19 @@ def db_asset_importer(database,inputfile):
 	for line in f.readlines():
 		if (not line in ['\n','\r\n']):
 			if line.startswith('http') or line.startswith('https'):
-				asset = (line.split('/')[-1]).strip();print "[" + str(asset_count+1) + "] " + asset
-				asset_uri = line.strip();print asset_uri
+				asset = (line.split('/')[-1]).strip();print("[" + str(asset_count+1) + "] " + asset)
+				asset_uri = line.strip();print(asset_uri)
 				c.execute("INSERT INTO assets (asset,asset_uri) \
 					VALUES (?,?)", (asset,asset_uri))
 				asset_count+=1
 	f.close()
 	conn.commit()
 	conn.close()
-	print;print('There were '+str(asset_count)+' assets imported from file ' + inputfile + '.');print
+	print();print('There were '+str(asset_count)+' assets imported from file ' + inputfile + '.');print()
 
 
 def get_inventory_print(database):
-	print;print('--------------------------------')
+	print('--------------------------------')
 	print('Assets Database:')
 
 	assets_new = []
@@ -404,7 +404,7 @@ def db_purge(database):
 	c.execute(sql)
 	conn.commit()
 	conn.close()
-	print;print('Database ' + database + ' purged.');print
+	print();print('Database ' + database + ' purged.');print()
 
 
 # Download asset from target
@@ -461,19 +461,19 @@ def download_target(url,ingest_count,assets_total):
 
 def print_assets(assets):
 	for asset in assets:
-		print "[" + str(asset[0]) + "] " + asset[1] + " | " + asset[2] + " | " + str(asset[3])
+		print("[" + str(asset[0]) + "] " + asset[1] + " | " + asset[2] + " | " + str(asset[3]))
 
 def print_help():
-	print
-	print "Usage:"
-	print "./stream.py -i <input-file>, where -i means 'ingest'. Imports the assets CSV file into the tool database."
-	print "./stream.py -p, where -p means 'purge'. Purges all assets from the assets database."
-	print "./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory."
-	print "./stream.py -l, where -l means 'list'. Prints all assets in the tool database."
-	print "./stream.py -s <output-file>, where -s means 'stream'. Combines all video files into single transport stream."
-	print "./stream.py -h, where -h means 'help'. Prints this help information."
-	print "./stream.py, runs the ingest script."
-	print
+	print()
+	print("Usage:")
+	print("./stream.py -i <input-file>, where -i means 'ingest'. Imports the assets CSV file into the tool database.")
+	print("./stream.py -p, where -p means 'purge'. Purges all assets from the assets database.")
+	print("./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory.")
+	print("./stream.py -l, where -l means 'list'. Prints all assets in the tool database.")
+	print("./stream.py -s <output-file>, where -s means 'stream'. Combines all video files into single transport stream.")
+	print("./stream.py -h, where -h means 'help'. Prints this help information.")
+	print("./stream.py, runs the ingest script.")
+	print()
 
 #-----------------------------------------------------------------------#
 # End of Functions
@@ -512,7 +512,7 @@ for opt, arg in opts:
 		assets_completed = inventory[3]
 		assets_failed = inventory[4]
 		if len(assets_completed) > 0:
-			print;print('There are ' + str(len(assets_completed)) + ' completed assets that will be deleted.')
+			print();print('There are ' + str(len(assets_completed)) + ' completed assets that will be deleted.')
 			for asset in assets_completed:
 				time.sleep(0.2)
 				delete_asset_db(asset[0])
@@ -528,7 +528,7 @@ for opt, arg in opts:
 
 		# Failed asset means the download failed, so remove the downloaded file
 		if len(assets_failed) > 0:
-			print;print('There are ' + str(len(assets_failed)) + ' failed assets that will be deleted.')
+			print();print('There are ' + str(len(assets_failed)) + ' failed assets that will be deleted.')
 			for asset in assets_failed:
 				time.sleep(0.2)
 				delete_asset_db(asset[0])
@@ -539,36 +539,36 @@ for opt, arg in opts:
 				elif deleted == False:
 					print('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
 		if (len(assets_completed) == 0) and (len(assets_failed) == 0):
-			print;print "There are no assets ready to be deleted."
-		print;sys.exit()
+			print();print("There are no assets ready to be deleted.")
+		print();sys.exit()
 
 	# List
 	elif opt == '-l':
 		inventory = db_get_inventory(database)
 		assets_new = inventory[0]
 		if len(assets_new) > 0:
-			print;print "New Assets = " + str(len(assets_new))
+			print();print("New Assets = " + str(len(assets_new)))
 			print_assets(assets_new)
 		assets_queued = inventory[1]
 		if len(assets_queued) > 0:
-			print;print "Queued Assets = " + str(len(assets_queued))
+			print();print("Queued Assets = " + str(len(assets_queued)))
 			print_assets(assets_queued)
 		assets_active = inventory[2]
 		if len(assets_active) > 0:
-			print;print "Active Assets = " + str(len(assets_active))
+			print();print("Active Assets = " + str(len(assets_active)))
 			print_assets(assets_active)
 		assets_completed = inventory[3]
 		if len(assets_completed) > 0:
-			print;print "Completed Assets = " + str(len(assets_completed))
+			print();print("Completed Assets = " + str(len(assets_completed)))
 			print_assets(assets_completed)
 		assets_failed = inventory[4]
 		if len(assets_failed) > 0:
-			print;print "Failed Assets = " + str(len(assets_failed))
+			print();print("Failed Assets = " + str(len(assets_failed)))
 			print_assets(assets_failed)
 		if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_active) == 0) and (len(assets_completed) == 0) and (len(assets_failed) == 0):
-			print;print("The database contains no assets.")
+			print();print("The database contains no assets.")
 		get_inventory_print(database)
-		print;sys.exit()
+		print();sys.exit()
 	
 	# Combine video files to a single stream file
 	elif opt == '-s':
@@ -591,14 +591,14 @@ for opt, arg in opts:
 					out_data += fp.read()
 				counter += 1	
 			fp.close()
-			print;print("Combining all *.ts files into single stream file " + output_file + "...")
+			print();print("Combining all *.ts files into single stream file " + output_file + "...")
 			with open(output_file, 'wb') as fp:
 				fp.write(out_data)
 			fp.close()
-			print;print('Done.')
+			print();print('Done.')
 		else:
-			print;print("Stream filename not specified.")
-		print;sys.exit()
+			print();print("Stream filename not specified.")
+		print();sys.exit()
 
 	# Import assets list file or HLS playlist
 	elif opt in ("-i", "--ifile"):
@@ -607,19 +607,19 @@ for opt, arg in opts:
 #----------------------------------------#
 # Run asset importer
 #----------------------------------------#
-print
+print()
 if inputfile:
 	if file_check_exists(inputfile):
 		if db_check_exists(database):
-			print;print('Importing assets file ' + inputfile + ' to database ' + database + '...');print
+			print();print('Importing assets file ' + inputfile + ' to database ' + database + '...');print()
 			db_asset_importer(database,inputfile)
 			#db_get_inventory_log(database)
 			sys.exit()
 		else:
-			print;print("Database file doesn't exist.");print
+			print();print("Database file doesn't exist.");print()
 			sys.exit()
 	else:
-		print;print("Import file doesn't exist.");print
+		print();print("Import file doesn't exist.");print()
 		sys.exit()
 
 
@@ -658,7 +658,7 @@ log.addHandler(handler)
 # Create storage path if it doesn't exist
 make_sure_path_exists(storage_path)
 
-print
+print()
 log.info('--------------------------------')
 log.info('Stream Downloader Tool')
 #log.info('--------------------------------')
@@ -811,14 +811,13 @@ while ingesting:
 		for asset in assets_failed:
 			db_update_asset_status(database,asset[0],status_queued)
 			log.info('Moved failed asset [' + str(asset[0]) + '] ' + asset[1] + ' to download queue.')
-			count+=1
 			filename = os.path.join(storage_path, asset[1])
 			deleted = delete_asset(filename)
 			if deleted == True:
 				log.info('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
 			elif deleted == False:
 				log.error('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
-		log.info('There are ' + str(count) + ' failed assets moved to download queue.')		
+		log.info('There are ' + str(len(assets_failed)) + ' failed assets moved to download queue.')		
 
 
 #----------------------------------------#
@@ -863,4 +862,4 @@ log.info('--------------------------------')
 
 #----------------------------------------#
 #red;white.blue()
-print;sys.exit()
+print();sys.exit()
