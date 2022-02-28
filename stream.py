@@ -829,12 +829,12 @@ log.info('Completed')
 
 dur = time.time() - stream_start_time
 pos = abs( int(dur) )
-day = pos / (3600*24)
+day = int(pos / (3600*24))
 rem = pos % (3600*24)
-hour = rem / 3600
+hour = int(rem / 3600)
 rem = rem % 3600
-mins = rem / 60
-secs = rem % 60
+mins = int(rem / 60)
+secs = int(rem % 60)
 
 if day == 1:
 	dtxt = "day"
