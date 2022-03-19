@@ -578,22 +578,10 @@ for opt, arg in opts:
 		if output_file:
 			inventory = db_get_inventory(database)
 			assets_completed = inventory[3]
-			# asset_list = []
-			# f=open('playback.m3u8','r')
-			# for line in f.readlines():
-			# 	if not line in ['\n','\r\n']:
-			# 		if line.startswith('http') or line.startswith('https'):
-			# 			asset = (line.split('/')[-1]).strip()
-			# 			asset_list.append(asset)
-			# f.close()
-
 			out_data = b''
 			for asset in assets_completed:
 				with open(storage_path + asset[1], 'rb') as fp:
 					print('[' + str(counter) + '] ' + asset[1])
-			# for file in asset_list:
-			# 	with open(storage_path + file, 'rb') as fp:
-			# 		print('[' + str(counter) + '] ' + file)
 					out_data += fp.read()
 				counter += 1	
 			fp.close()
