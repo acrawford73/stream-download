@@ -576,19 +576,12 @@ for opt, arg in opts:
 		output_file = arg
 		counter = 1
 		if output_file:
-			asset_list = []
-			f=open('playback.m3u8','r')
-			for line in f.readlines():
-				if not line in ['\n','\r\n']:
-					if line.startswith('http') or line.startswith('https'):
-						asset = (line.split('/')[-1]).strip()
-						asset_list.append(asset)
-			f.close()
-
+			inventory = db_get_inventory(database)
+			assets_completed = inventory[3]
 			out_data = b''
-			for file in asset_list:
-				with open(storage_path + file, 'rb') as fp:
-					print('[' + str(counter) + '] ' + file)
+			for asset in assets_completed:
+				with open(storage_path + asset[1], 'rb') as fp:
+					print('[' + str(counter) + '] ' + asset[1])
 					out_data += fp.read()
 				counter += 1	
 			fp.close()
@@ -829,12 +822,12 @@ log.info('Completed')
 
 dur = time.time() - stream_start_time
 pos = abs( int(dur) )
-day = pos / (3600*24)
+day = int(pos / (3600*24))
 rem = pos % (3600*24)
-hour = rem / 3600
+hour = int(rem / 3600)
 rem = rem % 3600
-mins = rem / 60
-secs = rem % 60
+mins = int(rem / 60)
+secs = int(rem % 60)
 
 if day == 1:
 	dtxt = "day"
