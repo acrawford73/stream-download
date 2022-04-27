@@ -6,7 +6,7 @@ Description: The tool downloads non-DRM ABR video files from CDNs based on the M
 
 ## Dependencies
 
-Python 2.x
+Python 3.x
 
 Package: python-pycurl
 
