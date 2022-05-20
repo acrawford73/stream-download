@@ -467,13 +467,13 @@ def print_assets(assets):
 def print_help():
 	print()
 	print("Usage:")
-	print("./stream.py -i <input-file>, where -i means 'ingest'. Imports the assets CSV file into the tool database.")
+	print("./stream.py -i <input-file>, where -i means 'import'. Imports the assets CSV file into the tool database.")
 	print("./stream.py -p, where -p means 'purge'. Purges all assets from the assets database.")
 	print("./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory.")
 	print("./stream.py -l, where -l means 'list'. Prints all assets in the tool database.")
 	print("./stream.py -s <output-file>, where -s means 'stream'. Combines all video files into single transport stream.")
 	print("./stream.py -h, where -h means 'help'. Prints this help information.")
-	print("./stream.py, runs the ingest script.")
+	print("./stream.py, runs the download script.")
 	print()
 
 #-----------------------------------------------------------------------#
@@ -619,7 +619,7 @@ if inputfile:
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
-# Bussit!  Start of ./stream.py ingest with logging
+# Bussit!  Start of ./stream.py download with logging
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 
@@ -687,14 +687,14 @@ if db_check_exists(database):
 
 # Determine if we need to continue processing assets from the last time the script was run
 if (len(assets_new) > 0) or (len(assets_queued) > 0) or (len(assets_active) > 0) or (len(assets_failed) > 0):
-	log.info('... Ingesting ...')
+	log.info('... Downloading ...')
 	ingesting = True
 else:
-	log.info('There are no assets available to ingest. Exiting...')
+	log.info('There are no assets available to download. Exiting...')
 
 
 #----------------------------------------#
-# Main Ingest Processing Loop
+# Main Download Processing Loop
 #----------------------------------------#
 
 while ingesting:
@@ -703,10 +703,10 @@ while ingesting:
 	# Exit if no assets available or ingest completed
 	if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_active) == 0) and (len(assets_failed) == 0):
 		ingesting = False
-		log.info('There are no assets ready to ingest, or ingest has completed. Exiting...')
+		log.info('There are no assets ready to download, or script has completed. Exiting...')
 		db_get_inventory_log(database)
 
-	# Ingest continues ...
+	# Download continues ...
 	else:
 		# Wait a bit before downloading next file
 		#time.sleep(ingest_interval)
@@ -788,7 +788,7 @@ while ingesting:
 	# Process New Assets
 	# Move New assets to Queued status
 	if len(assets_new) > 0:
-		log.info('There are ' + str(len(assets_new)) + ' new assets to ingest.' )
+		log.info('There are ' + str(len(assets_new)) + ' new assets to download.' )
 		count = 0
 		for asset in assets_new:
 			db_update_asset_status(database,asset[0],status_queued)
@@ -800,7 +800,7 @@ while ingesting:
 	# Process Failed Assets
 	# Move Failed assets to Queued status
 	if len(assets_failed) > 0:
-		log.info('There are ' + str(len(assets_failed)) + ' failed assets to reingest.' )
+		log.info('There are ' + str(len(assets_failed)) + ' failed assets to re-download.' )
 		count = 0
 		for asset in assets_failed:
 			db_update_asset_status(database,asset[0],status_queued)
@@ -816,7 +816,7 @@ while ingesting:
 
 #----------------------------------------#
 # Exit Summary
-log.info('Assets Ingested = ' + str(ingest_count))
+log.info('Assets Downloaded = ' + str(ingest_count))
 log.info('--------------------------------')
 log.info('Completed')
 
