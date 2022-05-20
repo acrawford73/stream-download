@@ -467,9 +467,9 @@ def print_assets(assets):
 def print_help():
 	print()
 	print("Usage:")
-	print("./stream.py -i <input-file>, where -i means 'import'. Imports the assets CSV file into the tool database.")
+	print("./stream.py -i <input-file>, where -i means 'import'. Imports the m3u8 playlist file into the tool database.")
 	print("./stream.py -p, where -p means 'purge'. Purges all assets from the assets database.")
-	print("./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database and NAS directory.")
+	print("./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database.")
 	print("./stream.py -l, where -l means 'list'. Prints all assets in the tool database.")
 	print("./stream.py -s <output-file>, where -s means 'stream'. Combines all video files into single transport stream.")
 	print("./stream.py -h, where -h means 'help'. Prints this help information.")
@@ -605,7 +605,7 @@ print()
 if inputfile:
 	if file_check_exists(inputfile):
 		if db_check_exists(database):
-			print();print('Importing assets file ' + inputfile + ' to database ' + database + '...');print()
+			print();print('Importing playlist file ' + inputfile + ' to database ' + database + '...');print()
 			db_asset_importer(database,inputfile)
 			#db_get_inventory_log(database)
 			sys.exit()
