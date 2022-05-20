@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 # Author: Anthony Crawford
-# Target Operating System: RedHat/CentOS 6/7
 # Python Version: 3
-# Package: pycurl (https://pypi.org/project/pycurl/)
-# sudo apt install python-pycurl
+# sudo apt install python3-pycurl
 # sudo apt install python-configparser
 # Purpose: Based on a list of assets, download video content.
 # -----------------------------------------------------------------------------
