@@ -754,7 +754,7 @@ while ingesting:
 					downloaded = False
 
 					# slack off a bit before each asset download
-					time.sleep(0.05)
+					#time.sleep(0.05)
 
 					# Download the asset file if not downloaded already
 					# Allows resume from last downloaded file
