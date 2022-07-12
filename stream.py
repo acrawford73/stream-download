@@ -848,7 +848,7 @@ else:
 	stxt = "seconds"
 
 duration = str(day)+' '+dtxt+' '+str(hour)+' '+htxt+' '+str(mins)+' '+mtxt+' '+str(secs)+' '+stxt
-log.info('Runtime = ' + duration)
+log.info('Runtime = ' + str(day)+"d:"+str(hour)+"h:"+str(mins)+"m:"+str(secs)+"s, " + duration)
 
 log.info('--------------------------------')
 
