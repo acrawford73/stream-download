@@ -5,7 +5,7 @@ For low quality archives
 360p
 HandBrakeCLI -i video.ts -o video.mp4 -e x264 -q 24 -r 24
 
-HandBrakeCLI - Z "Discord Small 2 Minutes 360p30" -i file.ts -o file.mp4 -e x264 -q 24 -r 23.976 -R 44.1 --ab 128 --mixdown mono
+HandBrakeCLI -Z "Discord Small 2 Minutes 360p30" -i file.ts -o file.mp4 -e x264 -q 24 -r 23.976 -R 44.1 --ab 128 --mixdown mono
 
 480p
 HandBrakeCLI -Z "Very Fast 480p30" -i video.ts -o video.mp4 -e x264 -q 26 -r 24
