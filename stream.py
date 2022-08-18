@@ -13,7 +13,6 @@ import sys
 import errno
 import datetime,time
 from time import strftime
-from distutils.util import strtobool
 from random import randint
 import shutil
 # Logging
@@ -27,11 +26,19 @@ import sqlite3
 import getopt
 import pycurl
 
+def str_to_bool(s):
+	if s == "True":
+		return True
+	elif s == "False":
+		return False
+	else:
+		return None
+
 ### Load Configuration Parameters
 config = configparser.ConfigParser()
 config.read('etc/config.conf')
 #
-debug = strtobool(config.get('tool', 'debug_enabled'))
+debug = str_to_bool(config.get('tool', 'debug_enabled'))
 database = config.get('tool', 'database')
 queue_limit = int(config.get('tool', 'queue_limit'))
 storage_path = config.get('tool', 'storage_path')
@@ -43,6 +50,7 @@ ingesting = False
 #-----------------------------------------------------------------------#
 # Functions
 #-----------------------------------------------------------------------#
+
 def make_sure_path_exists(path):
 	try:
 		os.makedirs(path)
