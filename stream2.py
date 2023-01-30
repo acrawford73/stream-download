@@ -4,11 +4,11 @@
 # sudo apt install python3-pycurl
 # sudo apt install python-configparser
 # Purpose: Based on a list of assets, download video content.
+# Multi-processing and Queues are used.
 # -----------------------------------------------------------------------------
 #
 ### Packages
 import os
-import re
 import sys
 import errno
 import datetime,time
@@ -438,7 +438,7 @@ def download_target(url,ingest_count,assets_total):
 	# The connection is dropped if the asset isn't downloaded within the c.TIMEOUT window.
 	#c.setopt(c.TIMEOUT, 60L)  # DO NOT set this timeout! 
 	c.setopt(c.NOSIGNAL, True)
-	#c.setopt(c.FORBID_REUSE, True)  # Disabled, it will reuse same TCP socket
+	#c.setopt(c.FORBID_REUSE, True)  # Disabled, reuse same TCP socket
 	c.setopt(c.FAILONERROR, True)
 	c.setopt(c.HTTPHEADER, headers)
 	c.setopt(c.NOPROGRESS, False)
@@ -629,8 +629,6 @@ if inputfile:
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 
-stream_start_time = time.time()
-
 #----------------------------------------#
 # Initialize Logging
 #----------------------------------------#
@@ -685,11 +683,11 @@ status_failed = 5
 if db_check_exists(database):
 	inventory = db_get_inventory_log(database)
 	assets_new = inventory[0]
+	assets_total = len(assets_new)
 	assets_queued = inventory[1]
 	assets_active = inventory[2]
 	assets_completed = inventory[3]
 	assets_failed = inventory[4]
-	assets_total = len(assets_new) + len(assets_queued) + len(assets_failed)
 
 # Determine if we need to continue processing assets from the last time the script was run
 if (len(assets_new) > 0) or (len(assets_queued) > 0) or (len(assets_active) > 0) or (len(assets_failed) > 0):
@@ -702,6 +700,8 @@ else:
 #----------------------------------------#
 # Main Download Processing Loop
 #----------------------------------------#
+
+stream_start_time = time.time()
 
 while ingesting:
 
@@ -861,5 +861,4 @@ log.info('Runtime = ' + str(day)+"d:"+str(hour)+"h:"+str(mins)+"m:"+str(secs)+"s
 log.info('--------------------------------')
 
 #----------------------------------------#
-#red;white.blue()
 print();sys.exit()

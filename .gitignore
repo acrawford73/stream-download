@@ -1,5 +1,5 @@
 database.db
-playback.m3u8
+playback.*
 gen.py
 log/
 video/
