@@ -604,9 +604,7 @@ for opt, arg in opts:
 	elif opt in ("-i", "--ifile"):
 		inputfile = arg
 
-#----------------------------------------#
-# Run asset importer
-#----------------------------------------#
+### Run asset importer
 print()
 if inputfile:
 	if file_check_exists(inputfile):
@@ -623,15 +621,9 @@ if inputfile:
 		sys.exit()
 
 
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------#
-# Bussit!  Start of ./stream.py download with logging
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------#
 
-#----------------------------------------#
-# Initialize Logging
-#----------------------------------------#
+### Initialize Logging
+
 log_file = strftime('stream_%Y%m%d_%H%M%S.log')
 log_path = config.get('tool', 'log_path')
 logfile = os.path.join(log_path, log_file)
@@ -662,9 +654,7 @@ log.info('Stream Downloader Tool')
 #log.info('--------------------------------')
 
 
-#----------------------------------------#
-# Initialize Asset Inventory from DB
-#----------------------------------------#
+### Initialize Asset Inventory from DB
 # [New, Queued, Active, Completed, Not Found, Failed]
 # Ingest Status:
 # 0 New

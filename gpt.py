@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Here is an example of a Python script that can add multiple .mp4 URLs to a queue, 
 # download multiple .mp4 files from the queue in parallel, based on the number of CPU cores.
 # Using the concurrent.futures, queue and multiprocessing library.
@@ -34,9 +35,7 @@ import sqlite3
 import pycurl
 
 
-#-----------------------------------------------------------------------#
-# Functions
-#-----------------------------------------------------------------------#
+### Functions
 
 def str_to_bool(s):
     if s == "True":
@@ -205,7 +204,7 @@ def get_inventory_print(database):
     print('Queued    = ' + str(len(assets_queued)))
     # Failed
     c = conn.cursor()
-    c.execute("SELECT * FROM assets WHERE status=3")
+    c.execute("SELECT * FROM assets WHERE status=6")
     assets_failed = c.fetchall()
     print('Failed    = ' + str(len(assets_failed)))
     # Completed
@@ -297,6 +296,21 @@ def file_check_exists(inputfile):
             print('Assets file ' + inputfile + ' not found!')
         return False
 
+def print_assets(assets):
+    for asset in assets:
+        print("[" + str(asset[0]) + "] " + asset[1] + " | " + asset[2] + " | " + str(asset[3]))
+
+def print_help():
+    print()
+    print("Usage:")
+    print("./stream.py -i <input-file>, where -i means 'import'. Imports the m3u8 playlist file into the tool database.")
+    print("./stream.py -p, where -p means 'purge'. Purges all assets from the assets database.")
+    print("./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database.")
+    print("./stream.py -l, where -l means 'list'. Prints all assets in the tool database.")
+    print("./stream.py -s <output-file>, where -s means 'save'. Combines all video files and saves as a single transport stream.")
+    print("./stream.py -h, where -h means 'help'. Prints this help information.")
+    print("./stream.py, runs the download script.")
+    print()
 
 def db_get_inventory_log(database):
     log.info('--------------------------------')
@@ -320,12 +334,12 @@ def db_get_inventory_log(database):
     log.info('Queued    = ' + str(len(assets_queued)))
     # Failed
     c = conn.cursor()
-    c.execute("SELECT * FROM assets WHERE status=7")
+    c.execute("SELECT * FROM assets WHERE status=6")
     assets_failed = c.fetchall()
     log.info('Failed    = ' + str(len(assets_failed)))
     # Completed
     c = conn.cursor()
-    c.execute("SELECT * FROM assets WHERE status=3")
+    c.execute("SELECT * FROM assets WHERE status=7")
     assets_completed = c.fetchall()
     log.info('Completed = ' + str(len(assets_completed)))
 
@@ -351,11 +365,11 @@ def db_get_inventory(database):
     assets_queued = c.fetchall()
     # Failed
     c = conn.cursor()
-    c.execute("SELECT * FROM assets WHERE status=7")
+    c.execute("SELECT * FROM assets WHERE status=6")
     assets_failed = c.fetchall()
     # Completed
     c = conn.cursor()
-    c.execute("SELECT * FROM assets WHERE status=3")
+    c.execute("SELECT * FROM assets WHERE status=7")
     assets_completed = c.fetchall()
 
     conn.close()
@@ -399,7 +413,7 @@ def db_purge(database):
 #     urllib.request.urlretrieve(url, filename)
 #     q.put(filename)
 
-def download_target(url,ingest_count,assets_total,aid):
+def download_target(url,assets_total):
     hostname = url.split('/')[2]
 
     headers = [
@@ -432,13 +446,16 @@ def download_target(url,ingest_count,assets_total,aid):
     filename = url.split('/')[-1]
     local_filename = os.path.join(storage_path, filename)
     with open(local_filename, 'wb') as f:
-        log.info("Downloading: ["+str(ingest_count)+"/"+str(assets_total)+"] " + filename)
+        #print();log.info("Downloading: " + filename)
+        #log.info("Downloading: ["+str(ingest_count)+"/"+str(assets_total)+"] " + filename)
         c.setopt(c.WRITEFUNCTION, f.write)
         try:
             c.perform()
-            db_update_asset_status(database,aid,status_completed)
+            #log.info('Asset download  ' + filename + ' completed in %0.3f seconds' % c.getinfo(c.TOTAL_TIME))
+            db_update_asset_status_asset(database,filename,3)
         except pycurl.error as e:
-            db_update_asset_status(database,aid,status_failed)
+            #log.info('Asset failed to download  ' + url)
+            db_update_asset_status_asset(database,filename,4)
             #print('Status Code: %d' % c.getinfo(c.RESPONSE_CODE))
             if e.args[0] == pycurl.E_COULDNT_CONNECT and c.exception:
                 log.error(c.exception)
@@ -450,32 +467,14 @@ def download_target(url,ingest_count,assets_total,aid):
         finally:
             f.close()
             c.close()
-        log.info('Asset download  ' + filename + ' completed in %0.3f seconds' % c.getinfo(c.TOTAL_TIME))
     return True
 
-def print_assets(assets):
-    for asset in assets:
-        print("[" + str(asset[0]) + "] " + asset[1] + " | " + asset[2] + " | " + str(asset[3]))
-
-def print_help():
-    print()
-    print("Usage:")
-    print("./stream.py -i <input-file>, where -i means 'import'. Imports the m3u8 playlist file into the tool database.")
-    print("./stream.py -p, where -p means 'purge'. Purges all assets from the assets database.")
-    print("./stream.py -d, where -d means 'delete'. Deletes Completed and Failed assets from the tool database.")
-    print("./stream.py -l, where -l means 'list'. Prints all assets in the tool database.")
-    print("./stream.py -s <output-file>, where -s means 'save'. Combines all video files and saves as a single transport stream.")
-    print("./stream.py -h, where -h means 'help'. Prints this help information.")
-    print("./stream.py, runs the download script.")
-    print()
-
-#-----------------------------------------------------------------------#
-# End of Functions
-#-----------------------------------------------------------------------#
+### End of Functions
 
 
 
 ##### Main #####
+
 if __name__ == "__main__":
 
     ### Load Configuration Parameters
@@ -556,7 +555,6 @@ if __name__ == "__main__":
             if len(assets_failed) > 0:
                 print();print('There are ' + str(len(assets_failed)) + ' failed assets that will be deleted.')
                 for asset in assets_failed:
-                    time.sleep(0.2)
                     delete_asset_db(asset[0])
                     filename = os.path.join(storage_path, asset[2].split('/')[-1])
                     deleted = delete_asset(filename)    
@@ -647,26 +645,21 @@ if __name__ == "__main__":
 
     status_new = 0
     status_queued = 1
-    status_failed = 3
+    status_failed = 6
     status_completed = 7
 
     ### Get the latest asset statuses
     if db_check_exists(database):
         inventory = db_get_inventory_log(database)
-        assets_new = inventory[status_new]
-        assets_queued = inventory[status_queued]
-        assets_completed = inventory[status_completed]
-        assets_failed = inventory[status_failed]
+        assets_new = inventory[0]
+        assets_queued = inventory[1]
+        assets_completed = inventory[2]
+        assets_failed = inventory[3]
         # Total number of assets for the download queue
         assets_total = len(assets_new) + len(assets_queued) + len(assets_failed)
 
     # Exit if no assets available or ingest completed
-    if assets_total == 0:
-        ingesting = False
-        log.info('There are no assets ready to download, or script has completed. Exiting...')
-        db_get_inventory_log(database)
-        sys.exit()
-    else:
+    if assets_total > 0:
         ingesting = True
         log.info('... Downloading ...')
         # Prepare the queue
@@ -680,6 +673,11 @@ if __name__ == "__main__":
         # Assets that failed to download previously
         for asset in assets_failed:
             q.put(asset[2])
+    else:
+        ingesting = False
+        log.info('There are no assets ready to download, or script has completed. Exiting...')
+        db_get_inventory_log(database)
+        sys.exit()
 
     num_cores = min(q.qsize(),cpu_count())
 
@@ -689,108 +687,109 @@ if __name__ == "__main__":
     with concurrent.futures.ProcessPoolExecutor(num_cores) as executor:
         while not q.empty():
             url = q.get()
-            executor.submit(download_target, url, q)
+            executor.submit(download_target, url, assets_total)
 
     while not q.empty():
         print(q.get())
 
 
-    sys.exit()
+#    sys.exit()
 
 
-    while ingesting:
 
-        #----------------------------------------#
-        # Exit if no assets available or ingest completed
-        if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_failed) == 0):
-            ingesting = False
-            log.info('There are no assets ready to download, or script has completed. Exiting...')
-            db_get_inventory_log(database)
+    # while ingesting:
 
-        # Download continues ...
-        else:
+    #     #----------------------------------------#
+    #     # Exit if no assets available or ingest completed
+    #     if (len(assets_new) == 0) and (len(assets_queued) == 0) and (len(assets_failed) == 0):
+    #         ingesting = False
+    #         log.info('There are no assets ready to download, or script has completed. Exiting...')
+    #         db_get_inventory_log(database)
 
-            # Get current asset inventory for processing
-            inventory = db_get_inventory(database)
-            assets_new = inventory[0]
-            assets_queued = inventory[1]
-            assets_completed = inventory[2]
-            assets_failed = inventory[3]
+    #     # Download continues ...
+    #     else:
 
-            log.debug('----------------')
-            log.debug('Asset Inventory:')
-            for asset in assets_new:
-                log.debug(asset)
-            log.debug('New       = ' + str(len(assets_new)))
-            for asset in assets_queued:
-                log.debug(asset)
-            log.debug('Queued    = ' + str(len(assets_queued)))
-            for asset in assets_completed:
-                log.debug(asset)
-            log.debug('Completed = ' + str(len(assets_completed)))
-            for asset in assets_failed:
-                log.debug(asset)
-            log.debug('Failed    = ' + str(len(assets_failed)))
+    #         # Get current asset inventory for processing
+    #         inventory = db_get_inventory(database)
+    #         assets_new = inventory[0]
+    #         assets_queued = inventory[1]
+    #         assets_completed = inventory[2]
+    #         assets_failed = inventory[3]
+
+    #         log.debug('----------------')
+    #         log.debug('Asset Inventory:')
+    #         for asset in assets_new:
+    #             log.debug(asset)
+    #         log.debug('New       = ' + str(len(assets_new)))
+    #         for asset in assets_queued:
+    #             log.debug(asset)
+    #         log.debug('Queued    = ' + str(len(assets_queued)))
+    #         for asset in assets_completed:
+    #             log.debug(asset)
+    #         log.debug('Completed = ' + str(len(assets_completed)))
+    #         for asset in assets_failed:
+    #             log.debug(asset)
+    #         log.debug('Failed    = ' + str(len(assets_failed)))
 
 
-        #----------------------------------------#
-        # Process Queued Assets
-        # Check if the asset is ingested already
-        if len(assets_queued) > 0:
+    #     #----------------------------------------#
+    #     # Process Queued Assets
+    #     # Check if the asset is ingested already
+    #     if len(assets_queued) > 0:
 
-            downloaded = False
+    #         downloaded = False
 
-            # slack off a bit before each asset download
-            # time.sleep(sleep_timer)
+    #         # slack off a bit before each asset download
+    #         # time.sleep(sleep_timer)
 
-            # Download the asset file if not downloaded already
-            # Allows resume from last downloaded file
-            if not file_check_exists(os.path.join('video/', asset[1])):
-                downloaded = download_target(asset[2],ingest_count+1,assets_total)
-            else:
-                continue
+    #         # Download the asset file if not downloaded already
+    #         # Allows resume from last downloaded file
+    #         if not file_check_exists(os.path.join('video/', asset[1])):
+    #             downloaded = download_target(asset[2],ingest_count+1,assets_total)
+    #         else:
+    #             continue
 
-            # Update database only if download was successful.
-            if downloaded == True:
-                db_update_asset_status(database,asset[0],status_completed)
-                log.debug('Asset [' + str(asset[0]) + '] ' + asset[1] + ' was successfully downloaded.')
-                ingest_count+=1
-            else:
-                db_update_asset_status(database,asset[0],status_failed)
-                log.error('Failed to download asset [' + str(asset[0]) + '] ' + asset[1])
-                csvfn_errors = log_file.rsplit('.',1)[0] + '_failed.csv'
-                csvfile_errors = os.path.join(log_path, csvfn_errors)
-                if os.path.exists(csvfile_errors) == False:
-                    with open(csvfile_errors, 'w') as f:
-                        f.write('asset,error\n')
-                    f.close()
-                csv_asset_failed(asset[1],csvfile_errors,"Failed to download asset from CDN")
+    #         # Update database only if download was successful.
+    #         if downloaded == True:
+    #             db_update_asset_status(database,asset[0],status_completed)
+    #             log.debug('Asset [' + str(asset[0]) + '] ' + asset[1] + ' was successfully downloaded.')
+    #             ingest_count+=1
+    #         else:
+    #             db_update_asset_status(database,asset[0],status_failed)
+    #             log.error('Failed to download asset [' + str(asset[0]) + '] ' + asset[1])
+    #             csvfn_errors = log_file.rsplit('.',1)[0] + '_failed.csv'
+    #             csvfile_errors = os.path.join(log_path, csvfn_errors)
+    #             if os.path.exists(csvfile_errors) == False:
+    #                 with open(csvfile_errors, 'w') as f:
+    #                     f.write('asset,error\n')
+    #                 f.close()
+    #             csv_asset_failed(asset[1],csvfile_errors,"Failed to download asset from CDN")
 
-        #-------------------------------------- --#
-        # Process New Assets
-        # Move New assets to Queued status
-        if len(assets_new) > 0:
-            log.info('There are ' + str(len(assets_new)) + ' new assets to download.' )
-            for asset in assets_new:
-                db_update_asset_status(database,asset[0],status_queued)
-                log.debug('Moved New asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
-            log.info('There are ' + str(len(assets_new)) + ' new assets moved to download queue.')
+    #     #-------------------------------------- --#
+    #     # Process New Assets
+    #     # Move New assets to Queued status
+    #     if len(assets_new) > 0:
+    #         log.info('There are ' + str(len(assets_new)) + ' new assets to download.' )
+    #         for asset in assets_new:
+    #             db_update_asset_status(database,asset[0],status_queued)
+    #             log.debug('Moved New asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
+    #         log.info('There are ' + str(len(assets_new)) + ' new assets moved to download queue.')
 
-        #----------------------------------------#
-        # Process Failed Assets
-        # Move Failed assets to Queued status
-        if len(assets_failed) > 0:
-            log.info('There are ' + str(len(assets_failed)) + ' failed assets to re-download.' )
-            for asset in assets_failed:
-                db_update_asset_status(database,asset[0],status_queued)
-                log.debug('Moved Failed asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
-                filename = os.path.join(storage_path, asset[1])
-                deleted = delete_asset(filename)
-                if deleted == True:
-                    log.info('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
-                elif deleted == False:
-                    log.error('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
-            log.info('There are ' + str(len(assets_failed)) + ' failed assets moved to download queue.')        
+    #     #----------------------------------------#
+    #     # Process Failed Assets
+    #     # Move Failed assets to Queued status
+    #     if len(assets_failed) > 0:
+    #         log.info('There are ' + str(len(assets_failed)) + ' failed assets to re-download.' )
+    #         for asset in assets_failed:
+    #             db_update_asset_status(database,asset[0],status_queued)
+    #             log.debug('Moved Failed asset [' + str(asset[0]) + '] ' + asset[1] + ' to Queue status.')
+    #             filename = os.path.join(storage_path, asset[1])
+    #             deleted = delete_asset(filename)
+    #             if deleted == True:
+    #                 log.info('Asset [' + str(asset[0]) + '] ' + filename + ' deleted.')
+    #             elif deleted == False:
+    #                 log.error('Asset [' + str(asset[0]) + '] ' + filename + ' not deleted.')
+    #         log.info('There are ' + str(len(assets_failed)) + ' failed assets moved to download queue.')        
 
 
 
