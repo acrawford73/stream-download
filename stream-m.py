@@ -177,7 +177,12 @@ def db_asset_importer(database,inputfile):
 	for line in f.readlines():
 		if (not line in ['\n','\r\n']):
 			if line.startswith('http') or line.startswith('https'):
-				asset = (line.split('/')[-1]).strip();print("[" + str(asset_count+1) + "] " + asset)
+				#asset = (line.split('/')[-1]).strip();print("[" + str(asset_count+1) + "] " + asset)
+				
+				m = re.search(r"[?&]r_file=([^&]+)", line)
+				if m:
+					asset = urllib.parse.unquote(m.group(1))
+
 				asset_uri = line.strip();print(asset_uri)
 				c.execute("INSERT INTO assets (asset,asset_uri) \
 					VALUES (?,?)", (asset,asset_uri))
